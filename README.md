@@ -22,7 +22,7 @@
 3. acessar container PHP:
 
     ```bash
-    docker exec -it php_fpm bash
+    docker exec -it projfipe_php bash
     ```
 
 4. Instalar dependências symfony e criar o banco:
