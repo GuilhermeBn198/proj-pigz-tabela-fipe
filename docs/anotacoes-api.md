@@ -19,3 +19,15 @@
     MesReferencia: "abril de 2025"
     SiglaCombustivel: "D"
   }
+
+## senha PEM
+
+- 1234
+
+## entidades
+
+- **user** possui os campos(por enquanto)
+  - email
+  - senha
+  - id
+  - role
