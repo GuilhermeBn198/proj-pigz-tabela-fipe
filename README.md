@@ -41,8 +41,9 @@
     openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem
     ```
 
-6. Abra no navegador:
+6. Sair do container e abrir o navegador
 
     ```bash
+    exit
     http://localhost:8080
     ```

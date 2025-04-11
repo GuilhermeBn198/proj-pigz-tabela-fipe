@@ -1,3 +1,6 @@
 - verificar dependências com composer install + symfony check:req
 - doctrine
 - doctrine orm
+- packages/security.yaml para configurar rotas seguras aparentemente
+- middleware de auth é automática no symfony, tudo configurado pelo security.yaml
+- lexik:jwt:generate-keypair faz o trabalho de gerar as chaves privada e pública.
