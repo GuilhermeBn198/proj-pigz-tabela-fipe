@@ -4,3 +4,5 @@
 - packages/security.yaml para configurar rotas seguras aparentemente
 - middleware de auth é automática no symfony, tudo configurado pelo security.yaml
 - lexik:jwt:generate-keypair faz o trabalho de gerar as chaves privada e pública.
+- por que joguei as rotas de usuario dentro de authcontroller?
+- rota api/login
