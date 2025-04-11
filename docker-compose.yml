@@ -1,61 +1,61 @@
 services:
+  # 1) Serviço PHP‑FPM
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: projfipe_php
+    volumes:
+      - ./projfipe:/var/www/html
+    networks:
+      - app-network
+
+  # 2) Servidor web Nginx
   nginx:
-    image: nginx:latest
-    container_name: nginx_server
+    image: nginx:alpine
+    container_name: projfipe_nginx
     ports:
       - "8080:80"
     volumes:
-      - ./symfony:/var/www/html:cached
+      - ./projfipe:/var/www/html:ro
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - php
     networks:
-      - symfony
+      - app-network
 
-  php:
-    build:
-      context: ./docker/php
-    container_name: php_fpm
-    volumes:
-      - ./symfony:/var/www/html:cached
-    environment:
-      - APP_ENV=dev
-    networks:
-      - symfony
-
+  # 3) Banco de dados MySQL
   mysql:
     image: mysql:8.0
-    container_name: mysql_db
-    restart: always
-    ports:
-      - "3306:3306"
+    container_name: projfipe_mysql
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: symfony
       MYSQL_USER: symfony
-      MYSQL_PASSWORD: symfony
+      MYSQL_PASSWORD: symfonypass
     volumes:
       - db_data:/var/lib/mysql
     networks:
-      - symfony
+      - app-network
 
+  # 4) Gerenciador de banco (phpMyAdmin)
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin
+    container_name: projfipe_phpmyadmin
     environment:
       PMA_HOST: mysql
-      PMA_USER: symfony
-      PMA_PASSWORD: symfony
+      PMA_USER: root
+      PMA_PASSWORD: rootpassword
     ports:
       - "8081:80"
     depends_on:
       - mysql
     networks:
-      - symfony
+      - app-network
 
 volumes:
   db_data:
 
 networks:
-  symfony:
+  app-network:
     driver: bridge

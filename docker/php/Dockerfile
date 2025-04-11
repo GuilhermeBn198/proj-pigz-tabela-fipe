@@ -1,20 +1,29 @@
-FROM php:8.2-fpm
+# Dockerfile em docker/php/Dockerfile
+FROM php:8.1-fpm
 
-# Instala dependências do sistema e extensões do PHP
-RUN apt-get update && apt-get install -y \
-    libpq-dev \
-    libzip-dev \
-    zip \
-    unzip \
-    git \
-    curl \
-    libonig-dev \
-    libxml2-dev \
-    libicu-dev \
-    && docker-php-ext-install pdo pdo_mysql intl zip
+# Instala dependências de sistema
+RUN apt-get update \
+  && apt-get install -y \
+     git \
+     libicu-dev \
+     libonig-dev \
+     libzip-dev \
+     zip \
+     unzip \
+     libxml2-dev \
+  && rm -rf /var/lib/apt/lists/*
 
-# Instala Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Instala extensões PHP necessárias
+RUN docker-php-ext-install \
+     intl \
+     mbstring \
+     pdo \
+     pdo_mysql \
+     zip \
+     xml \
+     opcache    
 
-# Define diretório de trabalho
+# Composer (do multi‑stage build oficial)
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
 WORKDIR /var/www/html
