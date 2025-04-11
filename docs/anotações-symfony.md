@@ -1,3 +1,3 @@
+- verificar dependências com composer install + symfony check:req
 - doctrine
 - doctrine orm
-- 

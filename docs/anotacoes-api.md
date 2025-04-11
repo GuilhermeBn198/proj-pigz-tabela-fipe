@@ -38,9 +38,10 @@
 
 - **Brand**
   - id
+  - fipeCode
   - nome
 
 - **Model**
   - id
+  - fipeCode
   - nome
-
