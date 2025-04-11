@@ -1,4 +1,4 @@
-# tabelafipe (GET)
+# Tabelafipe (GET)
 
 - carros/marcas
 - motos/marcas
@@ -20,14 +20,27 @@
     SiglaCombustivel: "D"
   }
 
-## senha PEM
+## Senha PEM
 
 - 1234
 
-## entidades
+## Entidades
 
-- **user** possui os campos(por enquanto)
+- **User** possui os campos(por enquanto)
   - email
   - senha
   - id
   - role
+
+- **Category**
+  - id
+  - nome
+
+- **Brand**
+  - id
+  - nome
+
+- **Model**
+  - id
+  - nome
+
