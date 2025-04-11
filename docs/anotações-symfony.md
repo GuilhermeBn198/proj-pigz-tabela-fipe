@@ -5,4 +5,6 @@
 - middleware de auth é automática no symfony, tudo configurado pelo security.yaml
 - lexik:jwt:generate-keypair faz o trabalho de gerar as chaves privada e pública.
 - por que joguei as rotas de usuario dentro de authcontroller?
-- rota api/login
+- rota api/login_check
+- autowiring
+- sudo chown -R $(whoami) $(pwd) para atribuir todos os arquivos de uma pasta para o meu usuario atual

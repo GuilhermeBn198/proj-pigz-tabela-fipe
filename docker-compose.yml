@@ -5,6 +5,10 @@ services:
       context: .
       dockerfile: docker/php/Dockerfile
     container_name: projfipe_php
+    environment:
+      JWT_SECRET_KEY: /var/www/html/config/jwt/private.pem
+      JWT_PUBLIC_KEY: /var/www/html/config/jwt/public.pem
+      JWT_PASSPHRASE: 1234
     volumes:
       - ./projfipe2:/var/www/html
     networks:
