@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class AuthController extends AbstractController
 {
@@ -19,13 +20,22 @@ class AuthController extends AbstractController
         Request $request,
         UserPasswordHasherInterface $passwordHasher,
         EntityManagerInterface $em,
-        JWTTokenManagerInterface $jwtManager
+        JWTTokenManagerInterface $jwtManager,
+        UserRepository $userRepo
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
 
-        // Cria e persiste o usuário
+        // Verifica duplicação antes de criar
+        if ($userRepo->findOneBy(['email' => $data['email']])) {
+            return new JsonResponse(
+                ['message' => 'Email já cadastrado'],
+                JsonResponse::HTTP_CONFLICT
+            );
+        }
+
         $user = new User();
         $user->setEmail($data['email']);
+        $user->setName($data['name']);
         $user->setPassword($passwordHasher->hashPassword($user, $data['password']));
         $user->setRoles(['ROLE_USER']);
         $em->persist($user);
