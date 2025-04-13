@@ -111,6 +111,11 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
         return $this;
     }
 
+    public function getUsername(): string //caso o lexik pegue use esse getUsername ele agirá como alias para o getUserIdentifier
+    {
+        return $this->getUserIdentifier();
+    }
+    
     /**
      * A visual identifier that represents this user.
      *

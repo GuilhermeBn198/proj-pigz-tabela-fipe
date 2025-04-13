@@ -13,3 +13,5 @@
 - **DOCTRINEFIXTURES --> doctrine:fixtures:load**  faz com que possamos criar "mocks" reais no banco de dados(o comando puro apaga todas as entradas do banco, se passar a flag --append, evita isso)
 - função dump e dd equivalem a função log do js
 - TEM DIFERENÇA ENTRE **use Symfony\Component\Routing\Route;** E **use Symfony\Component\Routing\ANNOTATION\Route;** !!!!! O segundo é usado quando geramos as rotas de forma automática pelo cli!!!
+- as nomenclaturas são estritas, não posso nomear algo que não condiz com a classe ou tipo do que estou tentando fazer. Ex: fiz um UserFixtures e nomeei o arquivo apenas User dentro da pasta DataFixtures. O symfony simplesmente não conseguia identificar ele. Parece com Java...
+- 

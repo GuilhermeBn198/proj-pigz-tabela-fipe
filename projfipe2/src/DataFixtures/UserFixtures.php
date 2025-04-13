@@ -25,7 +25,7 @@ class UserFixtures extends Fixture
         $admin->setPassword(
             $this->passwordHasher->hashPassword($admin, 'adminpass')
         );
-        $admin->setRoles(['ROLE_ADMIN']);
+        $admin->setRoles(['ROLE_ADMIN', 'ROLE_USER']);
         $manager->persist($admin);
 
         // 2) Usuário Comum 1
