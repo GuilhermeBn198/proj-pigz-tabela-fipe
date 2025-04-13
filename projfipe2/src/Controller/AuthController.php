@@ -50,6 +50,30 @@ class AuthController extends AbstractController
         );
     }
 
+
+    #[Route('/api/users/{id}/grant-admin', name: 'api_grant_admin', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function grantAdmin(int $id, UserRepository $userRepo, EntityManagerInterface $em): JsonResponse
+    {
+        $user = $userRepo->find($id);
+        if (!$user) {
+            return new JsonResponse(['message' => 'Usuário não encontrado'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        $roles = $user->getRoles();
+        if (in_array('ROLE_ADMIN', $roles)) {
+            return new JsonResponse(['message' => 'Usuário já é admin'], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        // Adiciona ROLE_ADMIN sem remover roles existentes
+        $roles[] = 'ROLE_ADMIN';
+        $user->setRoles(array_unique($roles));
+
+        $em->flush();
+
+        return new JsonResponse(['message' => 'Usuário promovido a admin com sucesso'], JsonResponse::HTTP_OK);
+    }
+
     #[Route('/api/users/{id}', name: 'api_user_findById', methods: ['GET'])]
     public function show(int $id, UserRepository $userRepository): JsonResponse
     {
