@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Dto\Auth\RegisterUserRequest;
+use App\Dto\Auth\UpdateUserRequest;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -12,42 +14,34 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 
 class AuthController extends AbstractController
 {
     #[Route('/api/register', name: 'api_register', methods: ['POST'])]
     public function register(
-        Request $request,
+        #[MapRequestPayload] RegisterUserRequest $dto,
         UserPasswordHasherInterface $passwordHasher,
         EntityManagerInterface $em,
         JWTTokenManagerInterface $jwtManager,
         UserRepository $userRepo
     ): JsonResponse {
-        $data = json_decode($request->getContent(), true);
 
-        // Verifica duplicação antes de criar
-        if ($userRepo->findOneBy(['email' => $data['email']])) {
-            return new JsonResponse(
-                ['message' => 'Email já cadastrado'],
-                JsonResponse::HTTP_CONFLICT
-            );
+        if ($userRepo->findOneBy(['email' => $dto->email])) {
+            return new JsonResponse(['message' => 'Email já cadastrado'], JsonResponse::HTTP_CONFLICT);
         }
 
         $user = new User();
-        $user->setEmail($data['email']);
-        $user->setName($data['name']);
-        $user->setPassword($passwordHasher->hashPassword($user, $data['password']));
+        $user->setEmail($dto->email);
+        $user->setName($dto->name);
+        $user->setPassword($passwordHasher->hashPassword($user, $dto->password));
         $user->setRoles(['ROLE_USER']);
+
         $em->persist($user);
         $em->flush();
 
-        // Gera o token JWT
         $token = $jwtManager->create($user);
-
-        return new JsonResponse(
-            ['token' => $token],
-            JsonResponse::HTTP_CREATED
-        );
+        return new JsonResponse(['token' => $token], JsonResponse::HTTP_CREATED);
     }
 
 
@@ -109,7 +103,7 @@ class AuthController extends AbstractController
     }
 
     #[Route('/api/users/{id}', name: 'api_user_update', methods: ['PATCH'])]
-    public function update(int $id, Request $request, UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $em): JsonResponse
+    public function update(int $id, #[MapRequestPayload] UpdateUserRequest $dto, Request $request, UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $em): JsonResponse
     {
         $user = $userRepository->find($id);
 
@@ -126,7 +120,7 @@ class AuthController extends AbstractController
         if (isset($data['name'])) {
             $user->setName($data['name']);
         }
-        
+
         if (isset($data['password'])) {
             $hashedPassword = $passwordHasher->hashPassword($user, $data['password']);
             $user->setPassword($hashedPassword);
