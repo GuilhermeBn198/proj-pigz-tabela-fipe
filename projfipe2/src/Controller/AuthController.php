@@ -9,7 +9,7 @@ use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class AuthController extends AbstractController
@@ -73,7 +73,7 @@ class AuthController extends AbstractController
         return new JsonResponse($userList, JsonResponse::HTTP_OK);
     }
 
-    #[Route('/api/users/{id}', name: 'api_user_update', methods: ['PUT'])]
+    #[Route('/api/users/{id}', name: 'api_user_update', methods: ['PATCH'])]
     public function update(int $id, Request $request, UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $em): JsonResponse
     {
         $user = $userRepository->find($id);
