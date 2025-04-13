@@ -8,3 +8,5 @@
 - rota api/login_check
 - autowiring
 - sudo chown -R $(whoami) $(pwd) para atribuir todos os arquivos de uma pasta para o meu usuario atual
+- DOCTRINEFIXTURES --> doctrine:fixtures:load  faz com que possamos criar "mocks" reais no banco de dados(o comando puro apaga todas as entradas do banco, se passar a flag --append, evita isso)
+- 

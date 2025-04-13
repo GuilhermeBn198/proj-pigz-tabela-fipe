@@ -9,7 +9,7 @@ use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class AuthController extends AbstractController
@@ -40,60 +40,76 @@ class AuthController extends AbstractController
         );
     }
 
-    #[Route('/api/users/{id}', name: 'api_user_show', methods: ['GET'])]
+    #[Route('/api/users/{id}', name: 'api_user_findById', methods: ['GET'])]
     public function show(int $id, UserRepository $userRepository): JsonResponse
     {
         $user = $userRepository->find($id);
-        
+
         if (!$user) {
             return new JsonResponse(['message' => 'Usuário não encontrado'], JsonResponse::HTTP_NOT_FOUND);
         }
-        
+
         return new JsonResponse([
             'id' => $user->getId(),
             'email' => $user->getEmail(),
             'roles' => $user->getRoles(),
         ], JsonResponse::HTTP_OK);
     }
-    
-    
+
+    #[Route('/api/users', name: 'api_user_list', methods: ['GET'])]
+    public function showAll(UserRepository $userRepository): JsonResponse
+    {
+        $users = $userRepository->findAll();
+
+        $userList = [];
+        foreach ($users as $user) {
+            $userList[] = [
+                'id' => $user->getId(),
+                'email' => $user->getEmail(),
+                'roles' => $user->getRoles(),
+            ];
+        }
+
+        return new JsonResponse($userList, JsonResponse::HTTP_OK);
+    }
+
     #[Route('/api/users/{id}', name: 'api_user_update', methods: ['PUT'])]
     public function update(int $id, Request $request, UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $em): JsonResponse
     {
         $user = $userRepository->find($id);
-        
+
         if (!$user) {
             return new JsonResponse(['message' => 'Usuário não encontrado'], JsonResponse::HTTP_NOT_FOUND);
         }
-        
+
         $data = json_decode($request->getContent(), true);
-        
+
         if (isset($data['email'])) {
             $user->setEmail($data['email']);
         }
-        
+
         if (isset($data['password'])) {
             $hashedPassword = $passwordHasher->hashPassword($user, $data['password']);
             $user->setPassword($hashedPassword);
         }
-        
+
         $em->flush();
-        
+
         return new JsonResponse(['message' => 'Usuário atualizado com sucesso'], JsonResponse::HTTP_OK);
     }
-    
+
     #[Route('/api/users/{id}', name: 'api_user_delete', methods: ['DELETE'])]
     public function delete(int $id, UserRepository $userRepository, EntityManagerInterface $em): JsonResponse
     {
         $user = $userRepository->find($id);
-        
+
         if (!$user) {
             return new JsonResponse(['message' => 'Usuário não encontrado'], JsonResponse::HTTP_NOT_FOUND);
         }
-        
+
         $em->remove($user);
         $em->flush();
-        
+
         return new JsonResponse(['message' => 'Usuário excluído com sucesso'], JsonResponse::HTTP_NO_CONTENT);
     }
 }
