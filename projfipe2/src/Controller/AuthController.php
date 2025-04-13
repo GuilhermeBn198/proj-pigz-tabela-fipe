@@ -99,6 +99,7 @@ class AuthController extends AbstractController
         foreach ($users as $user) {
             $userList[] = [
                 'id' => $user->getId(),
+                'name' => $user->getName(),
                 'email' => $user->getEmail(),
                 'roles' => $user->getRoles(),
             ];
@@ -122,6 +123,10 @@ class AuthController extends AbstractController
             $user->setEmail($data['email']);
         }
 
+        if (isset($data['name'])) {
+            $user->setName($data['name']);
+        }
+        
         if (isset($data['password'])) {
             $hashedPassword = $passwordHasher->hashPassword($user, $data['password']);
             $user->setPassword($hashedPassword);
