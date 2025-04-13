@@ -1,3 +1,5 @@
+# anotações de techs etc aprendidas durante o desafio.
+
 - verificar dependências com **composer install + symfony check:req(caso tenha instalado o symfony cli**
 - doctrine
 - doctrine orm
