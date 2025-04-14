@@ -4,8 +4,8 @@ controllers:
         namespace: App\Controller
     type: attribute
 
-api_login_check:
-    path: /api/login_check
-    controller: lexik_jwt_authentication.controller.login
-    methods: [POST]
-    defaults: { _format: json }
+# api_login_check:
+#     path: /api/login_check
+#     controller: lexik_jwt_authentication.controller.login
+#     methods: [POST]
+#     defaults: { _format: json }

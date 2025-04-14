@@ -5,11 +5,11 @@ namespace App\Controller;
 use App\Dto\Auth\GrantAdminRequest;
 use App\Dto\Auth\RegisterUserRequest;
 use App\Dto\Auth\UpdateUserRequest;
+use App\Dto\Auth\LoginRequest;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
@@ -19,6 +19,25 @@ use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 
 class AuthController extends AbstractController
 {
+    #[Route('/api/login', name: 'api_login', methods: ['POST'])]
+    public function login(
+        #[MapRequestPayload] LoginRequest $dto,
+        UserRepository $userRepo,
+        UserPasswordHasherInterface $hasher,
+        JWTTokenManagerInterface $jwtManager
+    ): JsonResponse {
+        $user = $userRepo->findOneBy(['email' => $dto->email]);
+        if (!$user || !$hasher->isPasswordValid($user, $dto->password)) {
+            return new JsonResponse(
+                ['message' => 'Credenciais inválidas'],
+                JsonResponse::HTTP_UNAUTHORIZED
+            );
+        }
+
+        $token = $jwtManager->create($user);
+        return new JsonResponse(['token' => $token], JsonResponse::HTTP_OK);
+    }
+
     #[Route('/api/register', methods: ['POST'])]
     public function register(
         #[MapRequestPayload] RegisterUserRequest $dto,

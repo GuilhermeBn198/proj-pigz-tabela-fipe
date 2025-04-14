@@ -17,14 +17,14 @@ security:
             security: false
 
         login:
-            pattern: ^/api/login_check
-            stateless: true
-            json_login:
-                check_path: /api/login_check
-                username_path: email
-                password_path: password
-                success_handler: lexik_jwt_authentication.handler.authentication_success
-                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+            # pattern: ^/api/login_check
+            # stateless: true
+            # json_login:
+            #     check_path: /api/login_check
+            #     username_path: email
+            #     password_path: password
+            #     success_handler: lexik_jwt_authentication.handler.authentication_success
+            #     failure_handler: lexik_jwt_authentication.handler.authentication_failure
 
         api:
             pattern: ^/api
@@ -43,7 +43,7 @@ security:
 
         # 4) registro e login continuam públicos
         - { path: ^/api/register$, roles: PUBLIC_ACCESS }
-        - { path: ^/api/login_check$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/login$, roles: PUBLIC_ACCESS }
 
         # 5) todo o resto da API exige autenticação
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
