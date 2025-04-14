@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Dto\Auth\GrantAdminRequest;
 use App\Dto\Auth\RegisterUserRequest;
 use App\Dto\Auth\UpdateUserRequest;
 use App\Entity\User;
@@ -18,7 +19,7 @@ use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 
 class AuthController extends AbstractController
 {
-    #[Route('/api/register', name: 'api_register', methods: ['POST'])]
+    #[Route('/api/register', methods: ['POST'])]
     public function register(
         #[MapRequestPayload] RegisterUserRequest $dto,
         UserPasswordHasherInterface $passwordHasher,
@@ -47,26 +48,29 @@ class AuthController extends AbstractController
 
     #[Route('/api/users/{id}/grant-admin', name: 'api_grant_admin', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN')]
-    public function grantAdmin(int $id, UserRepository $userRepo, EntityManagerInterface $em): JsonResponse
-    {
-        $user = $userRepo->find($id);
-        if (!$user) {
-            return new JsonResponse(['message' => 'Usuário não encontrado'], JsonResponse::HTTP_NOT_FOUND);
+    public function grantAdmin(
+        #[MapRequestPayload] GrantAdminRequest $dto,
+        UserRepository $userRepo,
+        EntityManagerInterface $em
+        ): JsonResponse {
+            $user = $userRepo->find($dto->id);
+            if (!$user) {
+                return new JsonResponse(['message' => 'Usuário não encontrado'], JsonResponse::HTTP_NOT_FOUND);
+            }
+
+            $roles = $user->getRoles();
+            if (in_array('ROLE_ADMIN', $roles)) {
+                return new JsonResponse(['message' => 'Usuário já é admin'], JsonResponse::HTTP_BAD_REQUEST);
+            }
+
+            // Adiciona ROLE_ADMIN sem remover roles existentes
+            $roles[] = 'ROLE_ADMIN';
+            $user->setRoles(array_unique($roles));
+
+            $em->flush();
+
+            return new JsonResponse(['message' => 'Usuário promovido a admin com sucesso'], JsonResponse::HTTP_OK);
         }
-
-        $roles = $user->getRoles();
-        if (in_array('ROLE_ADMIN', $roles)) {
-            return new JsonResponse(['message' => 'Usuário já é admin'], JsonResponse::HTTP_BAD_REQUEST);
-        }
-
-        // Adiciona ROLE_ADMIN sem remover roles existentes
-        $roles[] = 'ROLE_ADMIN';
-        $user->setRoles(array_unique($roles));
-
-        $em->flush();
-
-        return new JsonResponse(['message' => 'Usuário promovido a admin com sucesso'], JsonResponse::HTTP_OK);
-    }
 
     #[Route('/api/users/{id}', name: 'api_user_findById', methods: ['GET'])]
     public function show(int $id, UserRepository $userRepository): JsonResponse
@@ -103,31 +107,32 @@ class AuthController extends AbstractController
     }
 
     #[Route('/api/users/{id}', name: 'api_user_update', methods: ['PATCH'])]
-    public function update(int $id, #[MapRequestPayload] UpdateUserRequest $dto, Request $request, UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $em): JsonResponse
-    {
+    public function update(
+        int $id,
+        #[MapRequestPayload] UpdateUserRequest $dto,
+        UserRepository $userRepository,
+        UserPasswordHasherInterface $passwordHasher,
+        EntityManagerInterface $em
+    ): JsonResponse {
         $user = $userRepository->find($id);
-
         if (!$user) {
             return new JsonResponse(['message' => 'Usuário não encontrado'], JsonResponse::HTTP_NOT_FOUND);
         }
 
-        $data = json_decode($request->getContent(), true);
-
-        if (isset($data['email'])) {
-            $user->setEmail($data['email']);
+        // Usa o DTO validado
+        if ($dto->email !== null) {
+            $user->setEmail($dto->email);
         }
-
-        if (isset($data['name'])) {
-            $user->setName($data['name']);
+        if ($dto->name !== null) {
+            $user->setName($dto->name);
         }
-
-        if (isset($data['password'])) {
-            $hashedPassword = $passwordHasher->hashPassword($user, $data['password']);
-            $user->setPassword($hashedPassword);
+        if ($dto->password !== null) {
+            $user->setPassword(
+                $passwordHasher->hashPassword($user, $dto->password)
+            );
         }
 
         $em->flush();
-
         return new JsonResponse(['message' => 'Usuário atualizado com sucesso'], JsonResponse::HTTP_OK);
     }
 
