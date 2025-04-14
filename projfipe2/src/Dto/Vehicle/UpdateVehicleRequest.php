@@ -3,7 +3,7 @@ namespace App\Dto\Vehicle;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-class VehicleUpdateRequest
+class UpdateVehicleRequest
 {
     public function __construct(
         #[Assert\Choice(['carro','moto'])]

@@ -12,26 +12,27 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AuthController extends AbstractController
 {
     public function __construct(private AuthService $authService) {}
 
-    #[Route('/api/login', methods:['POST'])]
+    #[Route('/api/login', name: 'api_auth_login', methods:['POST'])]
     public function login(#[MapRequestPayload] LoginRequest $dto): JsonResponse
     {
         $token = $this->authService->login($dto);
         return $this->json(['token' => $token]);
     }
 
-    #[Route('/api/register', methods:['POST'])]
+    #[Route('/api/register', name: 'api_auth_register', methods:['POST'])]
     public function register(#[MapRequestPayload] RegisterUserRequest $dto): JsonResponse
     {
         $token = $this->authService->register($dto);
         return $this->json(['token' => $token], JsonResponse::HTTP_CREATED);
     }
 
-    #[Route('/api/users/{id}/grant-admin', methods:['POST'])]
+    #[Route('/api/users/{id}/grant-admin', name: 'api_auth_grantAdmin', methods:['POST'])]
     #[IsGranted('ROLE_ADMIN')]
     public function grantAdmin(#[MapRequestPayload] GrantAdminRequest $dto): JsonResponse
     {
