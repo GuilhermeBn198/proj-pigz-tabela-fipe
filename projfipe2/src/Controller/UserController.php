@@ -3,11 +3,13 @@
 namespace App\Controller;
 
 use App\Dto\Auth\UpdateUserRequest;
+use App\Entity\User;
 use App\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class UserController extends AbstractController
 {
@@ -28,16 +30,20 @@ class UserController extends AbstractController
     }
 
     #[Route('/api/users/{id}', name: 'api_user_update', methods:['PUT'])]
-    public function update(int $id, #[MapRequestPayload] UpdateUserRequest $dto): JsonResponse
-    {
-        $this->userService->update($id, $dto);
+    #[IsGranted('USER_EDIT', subject: 'user')]
+    public function update(
+        User $user,
+        #[MapRequestPayload] UpdateUserRequest $dto
+    ): JsonResponse {
+        $this->userService->update($user->getId(), $dto);
         return $this->json(['message' => 'Usuário atualizado com sucesso']);
     }
 
     #[Route('/api/users/{id}', name: 'api_user_delete', methods:['DELETE'])]
-    public function delete(int $id): JsonResponse
+    #[IsGranted('USER_DELETE', subject: 'user')]
+    public function delete(User $user): JsonResponse
     {
-        $this->userService->delete($id);
-        return $this->json(['message' => 'Usuário deletado com sucesso']);
+        $this->userService->delete($user->getId());
+        return $this->json(['message' => 'Usuário deletado com sucesso'], JsonResponse::HTTP_NO_CONTENT);
     }
 }

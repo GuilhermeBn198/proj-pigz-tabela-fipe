@@ -14,3 +14,4 @@
 - função dump e dd equivalem a função log do js
 - TEM DIFERENÇA ENTRE **use Symfony\Component\Routing\Route;** E **use Symfony\Component\Routing\ANNOTATION\Route;** !!!!! O segundo é usado quando geramos as rotas de forma automática pelo cli!!!
 - as nomenclaturas são estritas, não posso nomear algo que não condiz com a classe ou tipo do que estou tentando fazer. Ex: fiz um UserFixtures e nomeei o arquivo apenas User dentro da pasta DataFixtures. O symfony simplesmente não conseguia identificar ele. Parece com Java...
+- voteOnAttribute do Voter do symfony é o coração dessa parte de validação, é ele que determina se o usuário atual autenticado tem ou não permissão para realizar tal ação.
