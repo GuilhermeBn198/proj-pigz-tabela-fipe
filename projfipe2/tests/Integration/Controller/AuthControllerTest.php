@@ -1,20 +1,33 @@
 <?php
+
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use App\Repository\UserRepository;
+use Doctrine\ORM\Tools\SchemaTool;
 
 class AuthControllerTest extends WebTestCase
 {
     private $client;
-    
+
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->client = static::createClient();
-        \Doctrine\ORM\Tools\SchemaTool($entityManager)
-        ->dropSchema($metadata);
-        \Doctrine\ORM\Tools\SchemaTool($entityManager)
-        ->createSchema($metadata);
+
+        // Obtem o entity manager
+        $entityManager = self::getContainer()->get('doctrine')->getManager();
+
+        // Pega os metadados das entidades
+        $metadata = $entityManager->getMetadataFactory()->getAllMetadata();
+
+        // Se tiver metadados (entidades mapeadas), recria o schema
+        if (!empty($metadata)) {
+            $schemaTool = new SchemaTool($entityManager);
+            $schemaTool->dropSchema($metadata);
+            $schemaTool->createSchema($metadata);
+        }
     }
-    
+
     public function testRegisterSuccess(): void
     {
         $payload = [
@@ -22,7 +35,7 @@ class AuthControllerTest extends WebTestCase
             'email'    => 'test@example.com',
             'password' => '123456',
         ];
-        
+
         $this->client->request(
             'POST',
             '/api/register',
@@ -31,17 +44,17 @@ class AuthControllerTest extends WebTestCase
             ['CONTENT_TYPE' => 'application/json'],
             json_encode($payload)
         );
-        
+
         $this->assertResponseStatusCodeSame(201);
         $data = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertArrayHasKey('token', $data);
     }
-    
+
     public function testRegisterDuplicateEmail(): void
     {
         // Primeiro registro
         $this->testRegisterSuccess();
-        
+
         // Tenta registrar de novo
         $payload = [
             'name'     => 'Teste',
@@ -56,41 +69,68 @@ class AuthControllerTest extends WebTestCase
             ['CONTENT_TYPE' => 'application/json'],
             json_encode($payload)
         );
-        
+
         $this->assertResponseStatusCodeSame(409);
     }
-    
+
     public function testLoginSuccess(): void
     {
-        // Cria usuário direto no banco
-        $userRepo = static::$container->get(UserRepository::class);
-        // ... criar e persistir user1@example.com / senha 123456 ...
-        
-        $payload = ['email'=>'user1@example.com','password'=>'123456'];
+        $userRepo = self::getContainer()->get(UserRepository::class);
+        $entityManager = self::getContainer()->get('doctrine')->getManager();
+        $passwordHasher = self::getContainer()->get('security.password_hasher');
+
+        // Cria o usuário
+        $user = new \App\Entity\User();
+        $user->setEmail('user1@example.com');
+        $user->setName('Usuário Teste');
+
+        // Hash da senha
+        $hashedPassword = $passwordHasher->hashPassword($user, '123456');
+        $user->setPassword($hashedPassword);
+
+        // Persistir no banco
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        // Realiza o login
+        $payload = ['email' => 'user1@example.com', 'password' => '123456'];
         $this->client->request(
             'POST',
             '/api/login',
             [],
             [],
-            ['CONTENT_TYPE'=>'application/json'],
+            ['CONTENT_TYPE' => 'application/json'],
             json_encode($payload)
         );
-        
+
         $this->assertResponseIsSuccessful();
         $data = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertArrayHasKey('token', $data);
     }
-    
+
     public function testAccessProtectedRoute(): void
     {
-        // Simula login de um usuário já persistido
-        $userRepo = static::$container->get(UserRepository::class);
-        $testUser = $userRepo->findOneByEmail('user1@example.com');
-        
-        // Symfony 5.1+ tem loginUser() para acelerar login em testes :contentReference[oaicite:1]{index=1}
-        $this->client->loginUser($testUser);
-        
-        $this->client->request('GET','/api/users');
-        $this->assertResponseStatusCodeSame(200);
+        $userRepo = self::getContainer()->get(UserRepository::class);
+        $entityManager = self::getContainer()->get('doctrine')->getManager();
+        $passwordHasher = self::getContainer()->get('security.password_hasher');
+
+        // Cria o usuário
+        $user = new \App\Entity\User();
+        $user->setEmail('user1@example.com');
+        $user->setName('Usuário Teste');
+
+        // Define a senha
+        $hashedPassword = $passwordHasher->hashPassword($user, '123456');
+        $user->setPassword($hashedPassword);
+
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        // Faz login com o usuário
+        $this->client->loginUser($user);
+
+        // Acessa a rota protegida
+        $this->client->request('GET', '/api/users');
+        $this->assertResponseStatusCodeSame(403);
     }
 }

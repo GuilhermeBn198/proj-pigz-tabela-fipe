@@ -1,4 +1,4 @@
-# anotações de techs etc aprendidas durante o desafio
+# anotações de techs etc aprendidas/pontuadas durante o desafio
 
 - verificar dependências com **composer install + symfony check:req(caso tenha instalado o symfony cli**
 - doctrine
@@ -17,9 +17,10 @@
 - voteOnAttribute do Voter do symfony é o coração dessa parte de validação, é ele que determina se o usuário atual autenticado tem ou não permissão para realizar tal ação.
 - Services: extraímos lógica de negócio para AuthService e UserService, deixando controllers finos e testáveis.
 - Testes unitários: escrevemos testes PHPUnit para AuthService e UserService, mockando repositórios, hasher e EntityManager.
-- Cobertura de código: configuramos Xdebug e phpunit.xml.dist para gerar relatórios HTML e texto, e adicionamos scripts Composer (test, coverage, coverage:open).
+- Cobertura de código: configuramos Xdebug e phpunit.xml.dist para gerar relatórios HTML e texto, e adicionamos scripts Composer (test, test:Unit, Test:Integration, coverage, coverage:open).
+- Configuramos o banco de testes no mesmo container do banco de dados de dev, ele se chama symfony_teste devemos nos conectar com -> symfony_test_user:symfony_test_password.
 
-##  Em geral, testes unitários devem focar em lógica pura, sem depender de infraestrutura externa (DB, HTTP, etc.). Nesse projeto, isso significa
+## Em geral, testes unitários devem focar em lógica pura, sem depender de infraestrutura externa (DB, HTTP, etc.). Nesse projeto, isso significa
 
 - Services (e.g. AuthService, UserService) → contêm regras de negócio e hashing, geram tokens, lançam exceções
 - Voters (e.g. UserVoter, VehicleVoter) → encapsulam regras de autorização (admin vs. dono)
