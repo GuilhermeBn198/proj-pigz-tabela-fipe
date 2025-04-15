@@ -18,3 +18,11 @@
 - Services: extraímos lógica de negócio para AuthService e UserService, deixando controllers finos e testáveis.
 - Testes unitários: escrevemos testes PHPUnit para AuthService e UserService, mockando repositórios, hasher e EntityManager.
 - Cobertura de código: configuramos Xdebug e phpunit.xml.dist para gerar relatórios HTML e texto, e adicionamos scripts Composer (test, coverage, coverage:open).
+
+##  Em geral, testes unitários devem focar em lógica pura, sem depender de infraestrutura externa (DB, HTTP, etc.). Nesse projeto, isso significa
+
+- Services (e.g. AuthService, UserService) → contêm regras de negócio e hashing, geram tokens, lançam exceções
+- Voters (e.g. UserVoter, VehicleVoter) → encapsulam regras de autorização (admin vs. dono)
+- Value Objects / Helpers → qualquer classe que implemente lógica independente (p.ex. formatação, cálculos)
+- Entidades apenas se tiverem métodos com lógica (não só getters/setters)
+- DTOs só se implementarem lógica (conversões, validações custom)
