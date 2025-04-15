@@ -15,3 +15,6 @@
 - TEM DIFERENÇA ENTRE **use Symfony\Component\Routing\Route;** E **use Symfony\Component\Routing\ANNOTATION\Route;** !!!!! O segundo é usado quando geramos as rotas de forma automática pelo cli!!!
 - as nomenclaturas são estritas, não posso nomear algo que não condiz com a classe ou tipo do que estou tentando fazer. Ex: fiz um UserFixtures e nomeei o arquivo apenas User dentro da pasta DataFixtures. O symfony simplesmente não conseguia identificar ele. Parece com Java...
 - voteOnAttribute do Voter do symfony é o coração dessa parte de validação, é ele que determina se o usuário atual autenticado tem ou não permissão para realizar tal ação.
+- Services: extraímos lógica de negócio para AuthService e UserService, deixando controllers finos e testáveis.
+- Testes unitários: escrevemos testes PHPUnit para AuthService e UserService, mockando repositórios, hasher e EntityManager.
+- Cobertura de código: configuramos Xdebug e phpunit.xml.dist para gerar relatórios HTML e texto, e adicionamos scripts Composer (test, coverage, coverage:open).
