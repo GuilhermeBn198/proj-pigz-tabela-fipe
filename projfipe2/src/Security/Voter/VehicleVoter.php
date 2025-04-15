@@ -25,6 +25,7 @@ class VehicleVoter extends Voter
     {
         // Pega o usuário autenticado
         $user = $token->getUser();
+
         if (!$user instanceof UserInterface) {
             // Usuário não autenticado
             return false;
@@ -40,11 +41,13 @@ class VehicleVoter extends Voter
 
         // Para EDIT e DELETE, somente o proprietário do veículo pode alterar/excluir
         switch ($attribute) {
-            case self::EDIT:
+            case self::EDIT: 
+                return $vehicle->getUser()?->getUserIdentifier() === $user->getUserIdentifier();
             case self::DELETE:
-                // return $vehicle->getUser()->getId() === $user->getId();
+                return $vehicle->getUser()?->getUserIdentifier() === $user->getUserIdentifier();
+
             case self::VIEW:
-                return true; // Ou implemente lógica para VIEW, se necessário
+                return true; // Todos podem ver os veículos
         }
 
         return false;
