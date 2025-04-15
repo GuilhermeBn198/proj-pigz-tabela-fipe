@@ -5,18 +5,19 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class UpdateVehicleRequest
 {
-    public function __construct(
-        #[Assert\Choice(['carro','moto'])]
-        public readonly ?string $category = null,
+    #[Assert\Choice(['carro','moto'])]
+    #[Assert\NotBlank]
+    public readonly ?string $category;
 
-        public readonly ?string $brand = null,
+    #[Assert\NotBlank]
+    public readonly ?string $brand;
 
-        public readonly ?string $model = null,
+    #[Assert\NotBlank]
+    public readonly ?string $model;
 
-        #[Assert\GreaterThan(1900)]
-        public readonly ?int $year = null,
+    #[Assert\GreaterThan(1900)]
+    public readonly ?int $year;
 
-        #[Assert\Choice(['for_sale','sold'])]
-        public readonly ?string $status = null,
-    ) {}
+    #[Assert\Choice(['for_sale','sold'])]
+    public readonly ?string $status;
 }
