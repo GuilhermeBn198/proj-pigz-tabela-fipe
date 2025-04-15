@@ -4,24 +4,71 @@ namespace App\Entity;
 
 use App\Repository\ModelRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use App\Entity\Year;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: ModelRepository::class)]
 class Model
 {
+    public function __construct()
+    {
+        $this->years = new ArrayCollection();
+    }
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['fipe:model'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['fipe:model'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 20)]
+    #[Groups(['fipe:model'])]
     private ?string $fipeCode = null;
 
     #[ORM\ManyToOne(inversedBy: 'models')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['fipe:model'])]
     private ?Brand $brand = null;
+ 
+    /**
+     * @var Collection<int, Year>
+     */
+    #[ORM\OneToMany(targetEntity: Year::class, mappedBy: 'model', cascade: ['persist','remove'])]
+    #[Groups(['fipe:model'])]
+    private Collection $years;
+ 
+    /**
+     * @return Collection<int, Year>
+     */
+    public function getYears(): Collection
+    {
+        return $this->years;
+    }
+
+    public function addYear(Year $year): static
+    {
+        if (!$this->years->contains($year)) {
+            $this->years->add($year);
+            $year->setModel($this);
+        }
+        return $this;
+    }
+
+    public function removeYear(Year $year): static
+    {
+        if ($this->years->removeElement($year)) {
+            if ($year->getModel() === $this) {
+                $year->setModel(null);
+            }
+        }
+        return $this;
+    }
 
     public function getId(): ?int
     {
