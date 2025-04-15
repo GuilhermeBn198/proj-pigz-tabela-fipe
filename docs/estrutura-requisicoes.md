@@ -8,7 +8,7 @@
 2. Adm:
 
    - loga no sistema
-   - consegue CRUD usuarios, veiculos, anuncios.
+   - consegue CRUD usuarios, veiculos e anuncios de vendas
    - acesso a tudo
 
 3. Usuario(CLIENTE OU VENDEDOR, AMBOS PODEM COMPRAR VEICULO OU VENDER VEICULO):

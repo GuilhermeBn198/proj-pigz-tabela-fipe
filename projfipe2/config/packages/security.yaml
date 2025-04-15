@@ -45,9 +45,20 @@ security:
         - { path: ^/api/register$, roles: PUBLIC_ACCESS }
         - { path: ^/api/login$, roles: PUBLIC_ACCESS }
 
-        # 5) todo o resto da API exige autenticação
-        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+        # 5) CRUD FIPE (Brand, Model, Year) só para admins
+        - { path: ^/api/fipe, methods: [POST,PUT,PATCH,DELETE], roles: ROLE_ADMIN }
+        
+        # 6) Leitura FIPE para todos autenticados
+        - { path: ^/api/fipe, methods: [GET], roles: IS_AUTHENTICATED_FULLY }
+        
+        # 7) CRUD de veículos (apenas dono ou admin) – assumindo voters já configurados
+        - { path: ^/api/vehicles/\d+, methods: [PUT,PATCH,DELETE], roles: IS_AUTHENTICATED_FULLY }
+        
+        # 8) Listagem/visualização de veículos para todos
+        - { path: ^/api/vehicles, methods: [GET], roles: IS_AUTHENTICATED_FULLY }
 
+        # 9) todo o resto da API exige autenticação
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
     security:
