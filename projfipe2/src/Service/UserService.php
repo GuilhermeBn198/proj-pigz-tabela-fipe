@@ -27,6 +27,9 @@ class UserService
 
     public function listAll(): array
     {
+        if (!$this->userRepo->findAll()) {  
+            throw new \DomainException('Nenhum usuário encontrado');
+        }
         return $this->userRepo->findAll();
     }
 
