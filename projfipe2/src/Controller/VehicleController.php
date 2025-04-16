@@ -16,14 +16,14 @@ class VehicleController extends AbstractController
 {
     public function __construct(private VehicleService $svc) {}
 
-    #[Route('/api/vehicles', methods:['GET'])]
+    #[Route('/api/vehicles', methods: ['GET'])]
     public function listAll(): JsonResponse
     {
         $vehicles = $this->svc->listAll();
         return $this->json($vehicles, JsonResponse::HTTP_OK, [], ['groups' => 'vehicle:read']);
     }
 
-    #[Route('/api/vehicles', methods:['POST'])]
+    #[Route('/api/vehicles', methods: ['POST'])]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function create(
         #[MapRequestPayload] CreateVehicleRequest $dto
@@ -33,13 +33,13 @@ class VehicleController extends AbstractController
         return $this->json($vehicle, JsonResponse::HTTP_CREATED, [], ['groups' => 'vehicle:read']);
     }
 
-    #[Route('/api/vehicles/{id}', methods:['GET'])]
+    #[Route('/api/vehicles/{id}', methods: ['GET'])]
     public function show(Vehicle $vehicle): JsonResponse
     {
         return $this->json($vehicle, JsonResponse::HTTP_OK, [], ['groups' => 'vehicle:read']);
     }
 
-    #[Route('/api/vehicles/{id}', methods:['PATCH'])]
+    #[Route('/api/vehicles/{id}', methods: ['PATCH'])]
     #[IsGranted('VEHICLE_EDIT', subject: 'vehicle')]
     public function update(
         Vehicle $vehicle,
@@ -49,7 +49,7 @@ class VehicleController extends AbstractController
         return $this->json($vehicle, JsonResponse::HTTP_OK, [], ['groups' => 'vehicle:read']);
     }
 
-    #[Route('/api/vehicles/{id}', methods:['DELETE'])]
+    #[Route('/api/vehicles/{id}', methods: ['DELETE'])]
     #[IsGranted('VEHICLE_DELETE', subject: 'vehicle')]
     public function delete(Vehicle $vehicle): JsonResponse
     {
@@ -57,8 +57,9 @@ class VehicleController extends AbstractController
         return $this->json(null, JsonResponse::HTTP_NO_CONTENT);
     }
 
-    #[Route('/api/vehicles/{id}/transfer', methods:['POST'])]
-    #[IsGranted('VEHICLE_EDIT', subject: 'vehicle')]
+    #[Route('/api/vehicles/{id}/transfer', methods: ['POST'])]
+    // Atualizamos para utilizar o atributo do Voter apropriado para transferência.
+    #[IsGranted('VEHICLE_TRANSFER', subject: 'vehicle')]
     public function transfer(
         Vehicle $vehicle,
         #[MapRequestPayload] TransferVehicleRequest $dto

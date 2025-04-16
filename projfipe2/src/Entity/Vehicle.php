@@ -51,13 +51,12 @@ class Vehicle
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['vehicle:read'])]
     private ?Year $yearEntity = null;
+    
+    // Novo campo para registrar a data/hora da venda
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[Groups(['vehicle:read'])]
+    private ?\DateTimeInterface $soldAt = null;
 
-    public function getSalePrice(): ?float { return $this->salePrice; }
-    public function setSalePrice(float $p): static { $this->salePrice = $p; return $this; }
-    
-    public function getYearEntity(): ?Year { return $this->yearEntity; }
-    public function setYearEntity(Year $y): static { $this->yearEntity = $y; return $this; }
-    
     public function getId(): ?int
     {
         return $this->id;
@@ -132,6 +131,40 @@ class Vehicle
     {
         $this->model = $model;
         
+        return $this;
+    }
+    
+    public function getSalePrice(): ?float
+    {
+        return $this->salePrice;
+    }
+    
+    public function setSalePrice(float $p): static
+    {
+        $this->salePrice = $p;
+        return $this;
+    }
+    
+    public function getYearEntity(): ?Year
+    {
+        return $this->yearEntity;
+    }
+    
+    public function setYearEntity(Year $y): static
+    {
+        $this->yearEntity = $y;
+        return $this;
+    }
+    
+    // Novo getter e setter para soldAt
+    public function getSoldAt(): ?\DateTimeInterface
+    {
+        return $this->soldAt;
+    }
+
+    public function setSoldAt(?\DateTimeInterface $soldAt): static
+    {
+        $this->soldAt = $soldAt;
         return $this;
     }
 }
