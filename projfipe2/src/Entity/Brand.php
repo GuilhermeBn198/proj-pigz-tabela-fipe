@@ -15,18 +15,19 @@ class Brand
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fipe:brand'])]
+    #[Groups(['brand:read'])]
     private ?int $id = null;
     
     #[ORM\Column(length: 255)]
-    #[Groups(['fipe:brand'])]
+    #[Groups(['brand:read'])]
     private ?string $name = null;
     
     #[ORM\Column(length: 20)]
-    #[Groups(['fipe:brand'])]
+    #[Groups(['brand:read'])]
     private ?string $fipeCode = null;
 
     #[ORM\Column(enumType: VehicleType::class)]
+    #[Groups(['brand:read'])]
     private VehicleType $type;
     
     /**
@@ -69,7 +70,6 @@ class Brand
         return $this;
     }
 
-    #[Groups(['fipe:brand'])]
     public function getType(): VehicleType
     {
         return $this->type;

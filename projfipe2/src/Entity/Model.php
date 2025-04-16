@@ -20,27 +20,26 @@ class Model
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fipe:model'])]
+    #[Groups(['model:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['fipe:model'])]
+    #[Groups(['model:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 20)]
-    #[Groups(['fipe:model'])]
+    #[Groups(['model:read'])]
     private ?string $fipeCode = null;
 
     #[ORM\ManyToOne(inversedBy: 'models')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['fipe:model'])]
+    #[Groups(['model:read'])]
     private ?Brand $brand = null;
  
     /**
      * @var Collection<int, Year>
      */
     #[ORM\OneToMany(targetEntity: Year::class, mappedBy: 'model', cascade: ['persist','remove'])]
-    #[Groups(['fipe:model'])]
     private Collection $years;
  
     /**

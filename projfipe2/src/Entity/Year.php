@@ -15,20 +15,20 @@ class Year
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fipe:year'])]
+    #[Groups(['year:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['fipe:year'])]
+    #[Groups(['year:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['fipe:year'])]
+    #[Groups(['year:read'])]
     private ?string $fipeCode = null;
 
     #[ORM\ManyToOne(targetEntity: Model::class, inversedBy: 'years')]
     #[ORM\JoinColumn(nullable: true)]
-    #[Groups(['fipe:year'])]
+    #[Groups(['year:read'])]
     private ?Model $model = null;
 
     public function getModel(): ?Model
