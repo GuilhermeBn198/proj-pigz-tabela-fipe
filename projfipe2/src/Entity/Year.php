@@ -52,10 +52,9 @@ class Year
         return $this->fipeCode;
     }
 
-    public function setFipeCode(string $fipeCode): static
+    public function setFipeCode(string $code): static
     {
-        $this->fipeCode = $fipeCode;
-
+        $this->fipeCode = $code;
         return $this;
     }
 
