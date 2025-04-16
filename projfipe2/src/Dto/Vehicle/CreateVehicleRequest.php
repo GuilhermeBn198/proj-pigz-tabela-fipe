@@ -6,7 +6,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class CreateVehicleRequest
 {
     #[Assert\NotBlank]
-    #[Assert\Choice(['carro','moto'])]
+    #[Assert\Choice(['carros','motos', 'caminhoes'])]
     public readonly string $category;
 
     #[Assert\NotBlank]
@@ -18,4 +18,8 @@ class CreateVehicleRequest
     #[Assert\NotBlank]
     #[Assert\GreaterThan(1900)]
     public readonly int $year;
+    
+    #[Assert\NotBlank]
+    #[Assert\Positive]
+    public readonly float $salePrice;
 }
