@@ -1,55 +1,79 @@
 <?php
 
-namespace App\Security\Voter;
-
+use App\Entity\User;
 use App\Entity\Vehicle;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class VehicleVoter extends Voter
 {
-    // Defina os atributos (ações) que o voter suportará
-    public const EDIT   = 'VEHICLE_EDIT';
-    public const DELETE = 'VEHICLE_DELETE';
-    public const VIEW   = 'VEHICLE_VIEW';
+    public const EDIT = 'VEHICLE_EDIT';
+    public const TRANSFER = 'VEHICLE_TRANSFER';
 
-    protected function supports(string $attribute, mixed $subject): bool
+    protected function supports(string $attribute, $subject): bool
     {
-        // Se o atributo não for um dos que suportamos ou o subject não for Vehicle, retorna false.
-        return in_array($attribute, [self::EDIT, self::DELETE, self::VIEW])
-            && $subject instanceof Vehicle;
+        if (!in_array($attribute, [self::EDIT, self::TRANSFER], true)) {
+            return false;
+        }
+        if (!$subject instanceof Vehicle) {
+            return false;
+        }
+        return true;
     }
 
-    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
+    protected function voteOnAttribute(string $attribute, $vehicle, TokenInterface $token): bool
     {
-        // Pega o usuário autenticado
         $user = $token->getUser();
-
-        if (!$user instanceof UserInterface) {
-            // Usuário não autenticado
+        if (!$user instanceof User) {
             return false;
         }
 
-        /** @var Vehicle $vehicle */
-        $vehicle = $subject;
-
-        // Caso o usuário seja admin, pode fazer qualquer coisa
+        // ROLE_ADMIN pode fazer tudo
         if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
             return true;
         }
 
-        // Para EDIT e DELETE, somente o proprietário do veículo pode alterar/excluir
         switch ($attribute) {
-            case self::EDIT: 
-                return $vehicle->getUser()?->getUserIdentifier() === $user->getUserIdentifier();
-            case self::DELETE:
-                return $vehicle->getUser()?->getUserIdentifier() === $user->getUserIdentifier();
-
-            case self::VIEW:
-                return true; // Todos podem ver os veículos
+            case self::EDIT:
+                return $this->canEdit($vehicle, $user);
+            case self::TRANSFER:
+                return $this->canTransfer($vehicle, $user);
         }
 
         return false;
+    }
+
+    private function canEdit(Vehicle $vehicle, User $user): bool
+    {
+        // Apenas o dono do veículo pode editar (para usuários ROLE_USER)
+        return $user === $vehicle->getUser();
+    }
+
+    private function canTransfer(Vehicle $vehicle, User $user): bool
+    {
+        // Para a transferência (compra):
+        // 1. O comprador não pode ser o dono atual.
+        // 2. O veículo deve estar com o status 'for_sale'.
+        if ($user === $vehicle->getUser()) {
+            return false;
+        }
+
+        if ($vehicle->getStatus() !== 'for_sale') {
+            // Se o veículo estiver com status 'sold', pode haver restrição de tempo
+            if ($vehicle->getStatus() === 'sold' && $vehicle->getSoldAt() !== null) {
+                // Verifica se já se passou 1 hora desde a efetivação da venda
+                $interval = (new \DateTime())->getTimestamp() - $vehicle->getSoldAt()->getTimestamp();
+                if ($interval < 3600) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+
+        // Aqui, pode-se inserir validações adicionais, por exemplo:
+        // - Verificar se já existe uma solicitação pendente de aceitação do vendedor.
+        // - Registrar a transação em um log ou similar.
+        return true;
     }
 }

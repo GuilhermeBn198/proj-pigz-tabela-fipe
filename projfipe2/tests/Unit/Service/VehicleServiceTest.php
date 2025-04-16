@@ -170,56 +170,56 @@ class VehicleServiceTest extends TestCase
         $this->assertSame('for_sale', $vehicle->getStatus());
     }
     
-    // public function testUpdateVehicleUpdatesPriceAndStatus()
-    // {
-    //     $vehicle = new Vehicle();
-    //     $vehicle->setSalePrice('90000');
-    //     $vehicle->setStatus('for_sale');
+    public function testUpdateVehicleUpdatesPriceAndStatus()
+    {
+        $vehicle = new Vehicle();
+        $vehicle->setSalePrice('90000');
+        $vehicle->setStatus('for_sale');
     
-    //     $dto = new UpdateVehicleRequest(
-    //         salePrice: 95000.00,
-    //         status: 'sold'
-    //     );
+        $dto = new UpdateVehicleRequest(
+            salePrice: 95000.00,
+            status: 'sold'
+        );
     
-    //     $this->em->expects($this->once())->method('flush');
+        $this->em->expects($this->once())->method('flush');
     
-    //     $updatedVehicle = $this->vehicleService->updateVehicle($vehicle, $dto);
+        $updatedVehicle = $this->vehicleService->updateVehicle($vehicle, $dto);
     
-    //     $this->assertEquals('95000', $updatedVehicle->getSalePrice());
-    //     $this->assertEquals('sold', $updatedVehicle->getStatus());
-    // }
+        $this->assertEquals('95000', $updatedVehicle->getSalePrice());
+        $this->assertEquals('sold', $updatedVehicle->getStatus());
+    }
     
-    // public function testDeleteVehicleRemovesEntity()
-    // {
-    //     $vehicle = new Vehicle();
+    public function testDeleteVehicleRemovesEntity()
+    {
+        $vehicle = new Vehicle();
     
-    //     $this->em->expects($this->once())
-    //     ->method('remove')
-    //     ->with($vehicle);
-    //     $this->em->expects($this->once())
-    //     ->method('flush');
+        $this->em->expects($this->once())
+        ->method('remove')
+        ->with($vehicle);
+        $this->em->expects($this->once())
+        ->method('flush');
     
-    //     $this->vehicleService->deleteVehicle($vehicle);
-    // }
+        $this->vehicleService->deleteVehicle($vehicle);
+    }
     
-    // public function testTransferOwnershipSuccessfully()
-    // {
-    //     $vehicle = new Vehicle();
-    //     $oldOwner = new User();
-    //     $newOwner = new User();
-    //     $vehicle->setUser($oldOwner);
+    public function testTransferOwnershipSuccessfully()
+    {
+        $vehicle = new Vehicle();
+        $oldOwner = new User();
+        $newOwner = new User();
+        $vehicle->setUser($oldOwner);
     
-    //     $dto = new TransferVehicleRequest(
-    //         newOwnerEmail: $newOwner->getUserIdentifier()
-    //     );
+        $dto = new TransferVehicleRequest(
+            newOwnerEmail: $newOwner->getUserIdentifier()
+        );
     
-    //     $this->userRepo->method('findOneBy')->willReturn($newOwner);
-    //     $this->em->expects($this->once())->method('flush');
+        $this->userRepo->method('findOneBy')->willReturn($newOwner);
+        $this->em->expects($this->once())->method('flush');
     
-    //     $result = $this->vehicleService->transferOwnership($vehicle, $dto);
+        $result = $this->vehicleService->transferOwnership($vehicle, $dto);
     
-    //     $this->assertSame($newOwner, $result->getUser());
-    // }
+        $this->assertSame($newOwner, $result->getUser());
+    }
     
     // public function testTransferOwnershipThrowsIfUserNotFound()
     // {
