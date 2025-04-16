@@ -19,6 +19,11 @@
 - Testes unitários: escrevemos testes PHPUnit para AuthService e UserService, mockando repositórios, hasher e EntityManager.
 - Cobertura de código: configuramos Xdebug e phpunit.xml.dist para gerar relatórios HTML e texto, e adicionamos scripts Composer (test, test:Unit, Test:Integration, coverage, coverage:open).
 - Configuramos o banco de testes no mesmo container do banco de dados de dev, ele se chama symfony_teste devemos nos conectar com -> symfony_test_user:symfony_test_password.
+- TENTEI INSTALAR o nelmio/api-doc-bundle que dá suporte relativamente simples de configurar para o swagger de forma que a gnt possa documentar toda a api na rota /docs e depois configuramos o secutiry para permitir apenas acesso de usuários admin para a rota.
+  - o swagger, no symfony precisa estar instalado junto ao twig-bundle e o symfony/asset, pois é a partir deles que a rota html bonitinha é gerada. depois de instalada, temos q configurar o security para fazer a rota docs ser disponível apenas para quem deve ter acesso(admins) e instalar os assets através do comando **php bin/console assets:install --symlink**
+  - simplesmente precisa fazer configurações demais pra poder funcionar legal.
+
+
 
 ## Em geral, testes unitários devem focar em lógica pura, sem depender de infraestrutura externa (DB, HTTP, etc.). Nesse projeto, isso significa
 
