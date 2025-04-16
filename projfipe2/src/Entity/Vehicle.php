@@ -52,8 +52,8 @@ class Vehicle
     #[Groups(['vehicle:read'])]
     private ?Year $yearEntity = null;
 
-    public function getSalePrice(): ?string { return $this->salePrice; }
-    public function setSalePrice(string $p): static { $this->salePrice = $p; return $this; }
+    public function getSalePrice(): ?float { return $this->salePrice; }
+    public function setSalePrice(float $p): static { $this->salePrice = $p; return $this; }
     
     public function getYearEntity(): ?Year { return $this->yearEntity; }
     public function setYearEntity(Year $y): static { $this->yearEntity = $y; return $this; }
