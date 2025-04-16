@@ -43,9 +43,9 @@ class Vehicle
     #[Groups(['vehicle:read'])]
     private ?Model $model = null;
     
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: false)]
     #[Groups(['vehicle:read'])]
-    private ?string $salePrice = null; 
+    private ?float $salePrice = 0.00; 
     
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
