@@ -1,9 +1,9 @@
 <?php
-// src/Controller/VehicleController.php
 namespace App\Controller;
 
 use App\Dto\Vehicle\CreateVehicleRequest;
 use App\Dto\Vehicle\UpdateVehicleRequest;
+use App\Dto\Vehicle\TransferVehicleRequest;
 use App\Entity\Vehicle;
 use App\Service\VehicleService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,7 +20,7 @@ class VehicleController extends AbstractController
     public function listAll(): JsonResponse
     {
         $vehicles = $this->svc->listAll();
-        return $this->json($vehicles, 200, [], ['groups'=>'vehicle:read']);
+        return $this->json($vehicles, JsonResponse::HTTP_OK, [], ['groups' => 'vehicle:read']);
     }
 
     #[Route('/api/vehicles', methods:['POST'])]
@@ -28,43 +28,42 @@ class VehicleController extends AbstractController
     public function create(
         #[MapRequestPayload] CreateVehicleRequest $dto
     ): JsonResponse {
-        $userEmail = $this->getUser()->getUserIdentifier();
-        $vehicle = $this->svc->createVehicle($userEmail, $dto);
-        return $this->json($vehicle, 201, [], ['groups'=>'vehicle:read']);
+        $owner = $this->getUser();
+        $vehicle = $this->svc->createVehicle($owner, $dto);
+        return $this->json($vehicle, JsonResponse::HTTP_CREATED, [], ['groups' => 'vehicle:read']);
     }
 
     #[Route('/api/vehicles/{id}', methods:['GET'])]
     public function show(Vehicle $vehicle): JsonResponse
     {
-        return $this->json($vehicle, 200, [], ['groups'=>'vehicle:read']);
+        return $this->json($vehicle, JsonResponse::HTTP_OK, [], ['groups' => 'vehicle:read']);
     }
 
     #[Route('/api/vehicles/{id}', methods:['PATCH'])]
-    #[IsGranted('VEHICLE_EDIT', subject:'vehicle')]
+    #[IsGranted('VEHICLE_EDIT', subject: 'vehicle')]
     public function update(
         Vehicle $vehicle,
         #[MapRequestPayload] UpdateVehicleRequest $dto
     ): JsonResponse {
         $vehicle = $this->svc->updateVehicle($vehicle, $dto);
-        return $this->json($vehicle, 200, [], ['groups'=>'vehicle:read']);
+        return $this->json($vehicle, JsonResponse::HTTP_OK, [], ['groups' => 'vehicle:read']);
     }
 
     #[Route('/api/vehicles/{id}', methods:['DELETE'])]
-    #[IsGranted('VEHICLE_DELETE', subject:'vehicle')]
+    #[IsGranted('VEHICLE_DELETE', subject: 'vehicle')]
     public function delete(Vehicle $vehicle): JsonResponse
     {
         $this->svc->deleteVehicle($vehicle);
-        return $this->json(null, 204);
+        return $this->json(null, JsonResponse::HTTP_NO_CONTENT);
     }
 
     #[Route('/api/vehicles/{id}/transfer', methods:['POST'])]
-    #[IsGranted('VEHICLE_EDIT', subject:'vehicle')]
+    #[IsGranted('VEHICLE_EDIT', subject: 'vehicle')]
     public function transfer(
         Vehicle $vehicle,
-        #[MapRequestPayload] array $payload
+        #[MapRequestPayload] TransferVehicleRequest $dto
     ): JsonResponse {
-        $newEmail = $payload['newOwnerEmail'] ?? null;
-        $vehicle = $this->svc->transferOwnership($vehicle, $newEmail);
-        return $this->json($vehicle, 200, [], ['groups'=>'vehicle:read']);
+        $vehicle = $this->svc->transferOwnership($vehicle, $dto);
+        return $this->json($vehicle, JsonResponse::HTTP_OK, [], ['groups' => 'vehicle:read']);
     }
 }
