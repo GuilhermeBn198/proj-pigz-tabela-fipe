@@ -160,7 +160,7 @@ class VehicleService
     public function updateVehicle(Vehicle $vehicle, UpdateVehicleRequest $dto): Vehicle
     {
         if ($dto->salePrice !== null) {
-            $vehicle->setSalePrice(\number_format((float)$dto->salePrice, 2, '.', ''));
+            $vehicle->setSalePrice((string)$dto->salePrice);
         }
         if ($dto->status !== null) {
             $vehicle->setStatus($dto->status);

@@ -50,7 +50,7 @@ class Vehicle
     
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: false)]
     #[Groups(['vehicle:read', 'user:read'])]
-    private ?float $salePrice = 0.00; 
+    private ?string $salePrice = "0.00"; 
     
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -137,12 +137,12 @@ class Vehicle
         return $this;
     }
     
-    public function getSalePrice(): ?float
+    public function getSalePrice(): ?string
     {
         return $this->salePrice;
     }
     
-    public function setSalePrice(float $p): static
+    public function setSalePrice(string $p): static
     {
         $this->salePrice = $p;
         return $this;

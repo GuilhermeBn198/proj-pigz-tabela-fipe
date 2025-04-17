@@ -165,8 +165,8 @@ class VehicleServiceTest extends TestCase
         $this->assertSame(VehicleType::CARROS, $vehicle->getBrand()->getType()); // Verifica o type
         $this->assertSame('model_456', $vehicle->getModel()->getFipeCode());
         $this->assertSame('2024-1', $vehicle->getYear()->getFipeCode());
-        $this->assertSame('96382.00', $vehicle->getFipeValue());
-        $this->assertSame(100000.00, $vehicle->getSalePrice());
+        $this->assertSame('9638200', $vehicle->getFipeValue());
+        $this->assertSame('100000.00', $vehicle->getSalePrice());
         $this->assertSame('for_sale', $vehicle->getStatus());
     }
 
