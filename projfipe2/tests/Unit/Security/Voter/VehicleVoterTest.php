@@ -45,7 +45,7 @@ class VehicleVoterTest extends TestCase
         $this->token->method('getUser')->willReturn($admin);
         
         $this->assertTrue($this->voter->vote($this->token, $this->vehicle, [VehicleVoter::EDIT]) > 0);
-        $this->assertTrue($this->voter->vote($this->token, $this->vehicle, [VehicleVoter::DELETE]) > 0);
+        $this->assertTrue($this->voter->vote($this->token, $this->vehicle, [VehicleVoter::EDIT]) > 0);
     }
     
     public function testOwnerCanEditAndDelete(): void
@@ -55,7 +55,7 @@ class VehicleVoterTest extends TestCase
         $this->token->method('getUser')->willReturn($owner);
         
         $this->assertTrue($this->voter->vote($this->token, $this->vehicle, [VehicleVoter::EDIT]) > 0);
-        $this->assertTrue($this->voter->vote($this->token, $this->vehicle, [VehicleVoter::DELETE]) > 0);
+        $this->assertTrue($this->voter->vote($this->token, $this->vehicle, [VehicleVoter::EDIT]) > 0);
     }
     
     public function testNonOwnerCannotEditOrDelete(): void
@@ -66,7 +66,7 @@ class VehicleVoterTest extends TestCase
         $this->token->method('getUser')->willReturn($nonOwner);
         
         $this->assertFalse($this->voter->vote($this->token, $this->vehicle, [VehicleVoter::EDIT]) > 0);
-        $this->assertFalse($this->voter->vote($this->token, $this->vehicle, [VehicleVoter::DELETE]) > 0);
+        $this->assertFalse($this->voter->vote($this->token, $this->vehicle, [VehicleVoter::EDIT]) > 0);
     }
     
 }

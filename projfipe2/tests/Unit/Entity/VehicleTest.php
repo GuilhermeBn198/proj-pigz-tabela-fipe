@@ -83,12 +83,12 @@ class VehicleTest extends TestCase
         $this->assertSame($model, $vehicle->getModel());
     }
 
-    public function testSetAndGetYearEntity(): void
+    public function testSetAndGetYear(): void
     {
         $year = new Year();
         $vehicle = new Vehicle();
 
-        $vehicle->setYearEntity($year);
-        $this->assertSame($year, $vehicle->getYearEntity());
+        $vehicle->setYear($year);
+        $this->assertSame($year, $vehicle->getYear());
     }
 }
