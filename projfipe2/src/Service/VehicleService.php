@@ -176,32 +176,4 @@ class VehicleService
         $this->em->flush();
     }
 
-    /**
-     * Efetua a transferência de propriedade do veículo.
-     *
-     * Adaptação do fluxo de transferência:
-     * - Busca o novo proprietário via email.
-     * - Atualiza o veículo com o novo dono.
-     * - Define o status como 'sold'.
-     * - Registra o instante da venda em 'soldAt'.
-     *
-     * Essa implementação considera que as verificações de permissão já foram
-     * realizadas via Voter no controller.
-     */
-    public function transferOwnership(Vehicle $vehicle, TransferVehicleRequest $dto): Vehicle
-    {
-        $user = $this->userRepo->findOneBy(['email' => $dto->newOwnerEmail]);
-        if (!$user) {
-            throw new NotFoundHttpException("Usuário '{$dto->newOwnerEmail}' não encontrado.");
-        }
-
-        // Atualiza o veículo: novo proprietário, status vendido e registra o momento da venda.
-        $vehicle->setUser($user);
-        $vehicle->setStatus('sold');
-        $vehicle->setSoldAt(new \DateTime());
-
-        $this->em->flush();
-
-        return $vehicle;
-    }
 }

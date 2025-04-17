@@ -18,7 +18,7 @@ class VehicleController extends AbstractController
     public function __construct(private VehicleService $svc) {}
 
     #[Route('/api/vehicles', methods: ['GET'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_ADMIN')]
     public function listAll(): JsonResponse
     {
         $vehicles = $this->svc->listAll();
@@ -52,7 +52,7 @@ class VehicleController extends AbstractController
     }
 
     #[Route('/api/vehicles/{id}/accept-request', methods: ['POST'])]
-    #[IsGranted('VEHICLE_TRANSFER', subject: 'vehicle')]
+    #[IsGranted('VEHICLE_EDIT', subject: 'vehicle')]
     public function acceptRequest(Vehicle $vehicle): JsonResponse
     {
         $vehicle = $this->svc->acceptPurchaseRequest($vehicle);
@@ -60,7 +60,7 @@ class VehicleController extends AbstractController
     }
 
     #[Route('/api/vehicles/{id}/reject-request', methods: ['POST'])]
-    #[IsGranted('VEHICLE_TRANSFER', subject: 'vehicle')]
+    #[IsGranted('VEHICLE_EDIT', subject: 'vehicle')]
     public function rejectRequest(Vehicle $vehicle): JsonResponse
     {
         $vehicle = $this->svc->rejectPurchaseRequest($vehicle);
@@ -79,7 +79,7 @@ class VehicleController extends AbstractController
     }
 
     #[Route('/api/vehicles/{id}', methods: ['GET'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('VEHICLE_EDIT', subject: 'vehicle')]
     public function show(Vehicle $vehicle): JsonResponse
     {
         return $this->json($vehicle, JsonResponse::HTTP_OK, [], ['groups' => 'vehicle:read']);
@@ -103,13 +103,13 @@ class VehicleController extends AbstractController
         return $this->json(null, JsonResponse::HTTP_NO_CONTENT);
     }
 
-    #[Route('/api/vehicles/{id}/transfer', methods: ['POST'])]
-    #[IsGranted('VEHICLE_TRANSFER', subject: 'vehicle')]
-    public function transfer(
-        Vehicle $vehicle,
-        #[MapRequestPayload] TransferVehicleRequest $dto
-    ): JsonResponse {
-        $vehicle = $this->svc->transferOwnership($vehicle, $dto);
-        return $this->json($vehicle, JsonResponse::HTTP_OK, [], ['groups' => 'vehicle:read']);
-    }
+    // #[Route('/api/vehicles/{id}/transfer', methods: ['POST'])]
+    // #[IsGranted('VEHICLE_TRANSFER', subject: 'vehicle')]
+    // public function transfer(
+    //     Vehicle $vehicle,
+    //     #[MapRequestPayload] TransferVehicleRequest $dto
+    // ): JsonResponse {
+    //     $vehicle = $this->svc->transferOwnership($vehicle, $dto);
+    //     return $this->json($vehicle, JsonResponse::HTTP_OK, [], ['groups' => 'vehicle:read']);
+    // }
 }
