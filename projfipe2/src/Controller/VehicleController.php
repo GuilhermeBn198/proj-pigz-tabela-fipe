@@ -58,7 +58,6 @@ class VehicleController extends AbstractController
     }
 
     #[Route('/api/vehicles/{id}/transfer', methods: ['POST'])]
-    // Atualizamos para utilizar o atributo do Voter apropriado para transferência.
     #[IsGranted('VEHICLE_TRANSFER', subject: 'vehicle')]
     public function transfer(
         Vehicle $vehicle,
