@@ -24,11 +24,11 @@ class Model
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['model:read'])]
+    #[Groups(['model:read', 'vehicle:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 20)]
-    #[Groups(['model:read'])]
+    #[Groups(['model:read', 'vehicle:read'])]
     private ?string $fipeCode = null;
 
     #[ORM\ManyToOne(inversedBy: 'models')]

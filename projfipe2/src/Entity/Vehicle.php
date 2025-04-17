@@ -13,43 +13,43 @@ class Vehicle
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['vehicle:read'])]
+    #[Groups(['vehicle:read', 'user:read'])]
     private ?int $id = null;
     
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    #[Groups(['vehicle:read'])]
+    #[Groups(['vehicle:read', 'user:read'])]
     private ?string $fipeValue = null;
     
     #[ORM\Column(length: 255, columnDefinition: "ENUM('for_sale', 'sold') NOT NULL DEFAULT 'for_sale'")]
-    #[Groups(['vehicle:read'])]
+    #[Groups(['vehicle:read', 'user:read'])]
     private ?string $status = 'for_sale';
     
     #[ORM\ManyToOne(inversedBy: 'vehicles')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['vehicle:read'])]
     private ?User $user = null;
     
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['vehicle:read'])]
     private ?Category $category = null;
     
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['vehicle:read'])]
+    #[Groups(['vehicle:read', 'user:read'])]
     private ?Brand $brand = null;
     
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['vehicle:read'])]
+    #[Groups(['vehicle:read', 'user:read'])]
     private ?Model $model = null;
     
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: false)]
-    #[Groups(['vehicle:read'])]
+    #[Groups(['vehicle:read', 'user:read'])]
     private ?float $salePrice = 0.00; 
     
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['vehicle:read'])]
+    #[Groups(['vehicle:read', 'user:read'])]
     private ?Year $yearEntity = null;
     
     // Novo campo para registrar a data/hora da venda
@@ -97,7 +97,6 @@ class Vehicle
         
         return $this;
     }
-    
     public function getCategory(): ?Category
     {
         return $this->category;

@@ -76,18 +76,21 @@ class VehicleService
             $model->getFipeCode(),
             $yearEntity->getFipeCode()
         );
-        $fipeValue = preg_replace('/[^0-9.,]/', '', $details['Valor']);
-
+        $fipeValue = preg_replace('/[^0-9,]/', '', $details['Valor']);
+        $fipeValue = str_replace(',', '.', $fipeValue);
+        $fipeValue = (float) $fipeValue;
+        
         // Monta entidade Vehicle
         $vehicle = new Vehicle();
         $vehicle->setUser($owner)
-                ->setCategory($category)
-                ->setBrand($brand)
-                ->setModel($model)
-                ->setYearEntity($yearEntity)
-                ->setFipeValue($fipeValue)
-                ->setSalePrice((string)$dto->salePrice)
-                ->setStatus('for_sale');
+            ->setCategory($category)
+            ->setBrand($brand)
+            ->setModel($model)
+            ->setYearEntity($yearEntity)
+            ->setFipeValue($fipeValue)
+            ->setSalePrice((string)$dto->salePrice)
+            ->setStatus('for_sale');
+        
 
         $this->em->persist($vehicle);
         $this->em->flush();

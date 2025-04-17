@@ -19,11 +19,11 @@ class Brand
     private ?int $id = null;
     
     #[ORM\Column(length: 255)]
-    #[Groups(['brand:read'])]
+    #[Groups(['brand:read', 'vehicle:read'])]
     private ?string $name = null;
     
     #[ORM\Column(length: 20)]
-    #[Groups(['brand:read'])]
+    #[Groups(['brand:read', 'vehicle:read'])]
     private ?string $fipeCode = null;
 
     #[ORM\Column(enumType: VehicleType::class)]
