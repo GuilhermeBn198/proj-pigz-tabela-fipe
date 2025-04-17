@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller;
 
 use App\Dto\Vehicle\CreateVehicleRequest;
@@ -17,11 +18,55 @@ class VehicleController extends AbstractController
     public function __construct(private VehicleService $svc) {}
 
     #[Route('/api/vehicles', methods: ['GET'])]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function listAll(): JsonResponse
     {
         $vehicles = $this->svc->listAll();
         return $this->json($vehicles, JsonResponse::HTTP_OK, [], ['groups' => 'vehicle:read']);
     }
+
+    #[Route('/api/vehicles/sold', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function listAllSold(): JsonResponse
+    {
+        $vehicles = $this->svc->listAllSold();
+        return $this->json($vehicles, JsonResponse::HTTP_OK, [], ['groups' => 'vehicle:read']);
+    }
+
+    #[Route('/api/vehicles/for-sale', methods: ['GET'])]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    public function listAllForSale(): JsonResponse
+    {
+        $vehicles = $this->svc->listAllForSale();
+        return $this->json($vehicles, JsonResponse::HTTP_OK, [], ['groups' => 'vehicle:read']);
+    }
+
+    #[Route('/api/vehicles/{id}/request', methods: ['POST'])]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    public function requestPurchase(Vehicle $vehicle): JsonResponse
+    {
+        $buyer = $this->getUser();
+        $vehicle = $this->svc->requestPurchase($vehicle, $buyer);
+
+        return $this->json($vehicle, JsonResponse::HTTP_OK, [], ['groups' => 'vehicle:read']);
+    }
+
+    #[Route('/api/vehicles/{id}/accept-request', methods: ['POST'])]
+    #[IsGranted('VEHICLE_TRANSFER', subject: 'vehicle')]
+    public function acceptRequest(Vehicle $vehicle): JsonResponse
+    {
+        $vehicle = $this->svc->acceptPurchaseRequest($vehicle);
+        return $this->json($vehicle, JsonResponse::HTTP_OK, [], ['groups' => 'vehicle:read']);
+    }
+
+    #[Route('/api/vehicles/{id}/reject-request', methods: ['POST'])]
+    #[IsGranted('VEHICLE_TRANSFER', subject: 'vehicle')]
+    public function rejectRequest(Vehicle $vehicle): JsonResponse
+    {
+        $vehicle = $this->svc->rejectPurchaseRequest($vehicle);
+        return $this->json($vehicle, JsonResponse::HTTP_OK, [], ['groups' => 'vehicle:read']);
+    }
+
 
     #[Route('/api/vehicles', methods: ['POST'])]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
@@ -34,6 +79,7 @@ class VehicleController extends AbstractController
     }
 
     #[Route('/api/vehicles/{id}', methods: ['GET'])]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function show(Vehicle $vehicle): JsonResponse
     {
         return $this->json($vehicle, JsonResponse::HTTP_OK, [], ['groups' => 'vehicle:read']);

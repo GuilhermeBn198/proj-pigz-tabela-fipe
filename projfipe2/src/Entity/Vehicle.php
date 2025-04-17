@@ -20,9 +20,14 @@ class Vehicle
     #[Groups(['vehicle:read', 'user:read'])]
     private ?string $fipeValue = null;
     
-    #[ORM\Column(length: 255, columnDefinition: "ENUM('for_sale', 'sold') NOT NULL DEFAULT 'for_sale'")]
+    #[ORM\Column(length: 255, columnDefinition: "ENUM('for_sale', 'pending', 'sold') NOT NULL DEFAULT 'for_sale'")]
     #[Groups(['vehicle:read', 'user:read'])]
     private ?string $status = 'for_sale';
+    
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['vehicle:read', 'user:read'])]
+    private ?User $requestedBy = null;
     
     #[ORM\ManyToOne(inversedBy: 'vehicles')]
     #[ORM\JoinColumn(nullable: false)]
@@ -50,9 +55,8 @@ class Vehicle
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['vehicle:read', 'user:read'])]
-    private ?Year $yearEntity = null;
+    private ?Year $year = null;
     
-    // Novo campo para registrar a data/hora da venda
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     #[Groups(['vehicle:read'])]
     private ?\DateTimeInterface $soldAt = null;
@@ -144,18 +148,17 @@ class Vehicle
         return $this;
     }
     
-    public function getYearEntity(): ?Year
+    public function getYear(): ?Year
     {
-        return $this->yearEntity;
+        return $this->year;
     }
     
-    public function setYearEntity(Year $y): static
+    public function setYear(Year $y): static
     {
-        $this->yearEntity = $y;
+        $this->year = $y;
         return $this;
     }
     
-    // Novo getter e setter para soldAt
     public function getSoldAt(): ?\DateTimeInterface
     {
         return $this->soldAt;
@@ -166,4 +169,16 @@ class Vehicle
         $this->soldAt = $soldAt;
         return $this;
     }
+
+    public function getRequestedBy(): ?User
+    {
+        return $this->requestedBy;
+    }
+    
+    public function setRequestedBy(?User $user): static
+    {
+        $this->requestedBy = $user;
+        return $this;
+    }
+
 }

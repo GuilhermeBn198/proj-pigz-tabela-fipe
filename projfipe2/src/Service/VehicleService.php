@@ -37,6 +37,65 @@ class VehicleService
         return $this->em->getRepository(Vehicle::class)->findAll();
     }
 
+    public function listAllForSale(): array
+    {
+        return $this->em->getRepository(Vehicle::class)->findBy(['status' => 'for_sale']);
+    }
+
+    public function listAllSold(): array
+    {
+        return $this->em->getRepository(Vehicle::class)->findBy(['status' => 'sold']);
+    }
+
+    public function requestPurchase(Vehicle $vehicle, User $buyer): Vehicle
+    {
+        if ($vehicle->getStatus() !== 'for_sale') {
+            throw new \RuntimeException('Veículo não está disponível para compra.');
+        }
+
+        if ($vehicle->getUser() === $buyer) {
+            throw new \RuntimeException('Você não pode solicitar seu próprio veículo.');
+        }
+
+        $vehicle->setStatus('pending');
+        $vehicle->setRequestedBy($buyer);
+
+        $this->em->flush();
+
+        return $vehicle;
+    }
+
+    public function acceptPurchaseRequest(Vehicle $vehicle): Vehicle
+    {
+        if ($vehicle->getStatus() !== 'pending' || !$vehicle->getRequestedBy()) {
+            throw new \RuntimeException('Nenhuma solicitação pendente.');
+        }
+
+        $vehicle->setUser($vehicle->getRequestedBy());
+        $vehicle->setStatus('sold');
+        $vehicle->setSoldAt(new \DateTime());
+        $vehicle->setRequestedBy(null);
+
+        $this->em->flush();
+
+        return $vehicle;
+    }
+
+    public function rejectPurchaseRequest(Vehicle $vehicle): Vehicle
+    {
+        if ($vehicle->getStatus() !== 'pending') {
+            throw new \RuntimeException('Nenhuma solicitação pendente.');
+        }
+
+        $vehicle->setStatus('for_sale');
+        $vehicle->setRequestedBy(null);
+
+        $this->em->flush();
+
+        return $vehicle;
+    }
+
+
     /**
      * Cria um veículo atrelado a um usuário, usando dados locais e a API FIPE para o valor.
      */
@@ -61,11 +120,11 @@ class VehicleService
         }
 
         // Ano: busca pelo código FIPE completo (ex: "2014-1")
-        $yearEntity = $this->yearRepo->findOneBy([
+        $year = $this->yearRepo->findOneBy([
             'model'    => $model,
             'fipeCode' => $dto->yearCode
         ]);
-        if (!$yearEntity) {
+        if (!$year) {
             throw new NotFoundHttpException("Ano '{$dto->yearCode}' não encontrado para o modelo.");
         }
 
@@ -74,23 +133,23 @@ class VehicleService
             $brand->getType(),
             $brand->getFipeCode(),
             $model->getFipeCode(),
-            $yearEntity->getFipeCode()
+            $year->getFipeCode()
         );
         $fipeValue = preg_replace('/[^0-9,]/', '', $details['Valor']);
         $fipeValue = str_replace(',', '.', $fipeValue);
         $fipeValue = (float) $fipeValue;
-        
+
         // Monta entidade Vehicle
         $vehicle = new Vehicle();
         $vehicle->setUser($owner)
             ->setCategory($category)
             ->setBrand($brand)
             ->setModel($model)
-            ->setYearEntity($yearEntity)
+            ->setYear($year)
             ->setFipeValue($fipeValue)
-            ->setSalePrice((string)$dto->salePrice)
+            ->setSalePrice(\number_format((float)$dto->salePrice, 2, '.', ''))
             ->setStatus('for_sale');
-        
+
 
         $this->em->persist($vehicle);
         $this->em->flush();
@@ -98,13 +157,10 @@ class VehicleService
         return $vehicle;
     }
 
-    /**
-     * Atualiza o salePrice e o status de um veículo.
-     */
     public function updateVehicle(Vehicle $vehicle, UpdateVehicleRequest $dto): Vehicle
     {
         if ($dto->salePrice !== null) {
-            $vehicle->setSalePrice((string)$dto->salePrice);
+            $vehicle->setSalePrice(\number_format((float)$dto->salePrice, 2, '.', ''));
         }
         if ($dto->status !== null) {
             $vehicle->setStatus($dto->status);
@@ -114,9 +170,6 @@ class VehicleService
         return $vehicle;
     }
 
-    /**
-     * Remove um veículo.
-     */
     public function deleteVehicle(Vehicle $vehicle): void
     {
         $this->em->remove($vehicle);
